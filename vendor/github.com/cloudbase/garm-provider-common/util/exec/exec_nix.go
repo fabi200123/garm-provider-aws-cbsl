@@ -1,3 +1,6 @@
+//go:build !windows
+// +build !windows
+
 // Copyright 2023 Cloudbase Solutions SRL
 //
 //    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -12,17 +15,12 @@
 //    License for the specific language governing permissions and limitations
 //    under the License.
 
-package execution
+package exec
 
-type ExecutionCommand string
-
-const (
-	CreateInstanceCommand     ExecutionCommand = "CreateInstance"
-	DeleteInstanceCommand     ExecutionCommand = "DeleteInstance"
-	GetInstanceCommand        ExecutionCommand = "GetInstance"
-	ListInstancesCommand      ExecutionCommand = "ListInstances"
-	StartInstanceCommand      ExecutionCommand = "StartInstance"
-	StopInstanceCommand       ExecutionCommand = "StopInstance"
-	GetVersionInfoCommand     ExecutionCommand = "GetVersionInfo"
-	RemoveAllInstancesCommand ExecutionCommand = "RemoveAllInstances"
+import (
+	"golang.org/x/sys/unix"
 )
+
+func IsExecutable(path string) bool {
+	return unix.Access(path, unix.X_OK) == nil
+}

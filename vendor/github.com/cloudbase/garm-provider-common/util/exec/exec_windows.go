@@ -12,17 +12,21 @@
 //    License for the specific language governing permissions and limitations
 //    under the License.
 
-package execution
+package exec
 
-type ExecutionCommand string
-
-const (
-	CreateInstanceCommand     ExecutionCommand = "CreateInstance"
-	DeleteInstanceCommand     ExecutionCommand = "DeleteInstance"
-	GetInstanceCommand        ExecutionCommand = "GetInstance"
-	ListInstancesCommand      ExecutionCommand = "ListInstances"
-	StartInstanceCommand      ExecutionCommand = "StartInstance"
-	StopInstanceCommand       ExecutionCommand = "StopInstance"
-	GetVersionInfoCommand     ExecutionCommand = "GetVersionInfo"
-	RemoveAllInstancesCommand ExecutionCommand = "RemoveAllInstances"
+import (
+	"os"
+	"strings"
 )
+
+func IsExecutable(path string) bool {
+	pathExt := os.Getenv("PATHEXT")
+	execList := strings.Split(pathExt, ";")
+	for _, ext := range execList {
+		if strings.HasSuffix(path, ext) {
+			return true
+		}
+	}
+
+	return false
+}

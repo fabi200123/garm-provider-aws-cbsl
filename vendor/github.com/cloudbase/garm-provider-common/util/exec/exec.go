@@ -12,17 +12,28 @@
 //    License for the specific language governing permissions and limitations
 //    under the License.
 
-package execution
+package exec
 
-type ExecutionCommand string
+import (
+	"bytes"
+	"context"
+	"os/exec"
 
-const (
-	CreateInstanceCommand     ExecutionCommand = "CreateInstance"
-	DeleteInstanceCommand     ExecutionCommand = "DeleteInstance"
-	GetInstanceCommand        ExecutionCommand = "GetInstance"
-	ListInstancesCommand      ExecutionCommand = "ListInstances"
-	StartInstanceCommand      ExecutionCommand = "StartInstance"
-	StopInstanceCommand       ExecutionCommand = "StopInstance"
-	GetVersionInfoCommand     ExecutionCommand = "GetVersionInfo"
-	RemoveAllInstancesCommand ExecutionCommand = "RemoveAllInstances"
+	"github.com/pkg/errors"
 )
+
+func Exec(ctx context.Context, providerBin string, stdinData []byte, environ []string) ([]byte, error) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	c := exec.CommandContext(ctx, providerBin)
+	c.Env = environ
+	c.Stdin = bytes.NewBuffer(stdinData)
+	c.Stdout = stdout
+	c.Stderr = stderr
+
+	if err := c.Run(); err != nil {
+		return nil, errors.Wrapf(err, "provider binary failed with stdout: %s; stderr: %s", stdout.String(), stderr.String())
+	}
+
+	return stdout.Bytes(), nil
+}

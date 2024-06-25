@@ -24,7 +24,7 @@ import (
 	"os"
 
 	gErrors "github.com/cloudbase/garm-provider-common/errors"
-	params "github.com/cloudbase/garm-provider-common/params/v0.1.0"
+	"github.com/cloudbase/garm-provider-common/params"
 
 	"github.com/mattn/go-isatty"
 )

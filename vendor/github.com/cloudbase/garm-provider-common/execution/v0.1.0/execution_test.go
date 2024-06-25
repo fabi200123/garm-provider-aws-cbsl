@@ -82,11 +82,11 @@ func (p *testExternalProvider) Start(context.Context, string) error {
 	return nil
 }
 
-func (p *testExternalProvider) GetVersionInfo(context.Context) (params.ProviderVersion, error) {
+func (p *testExternalProvider) GetVersionInfo(context.Context) (params.ProviderVersionInfo, error) {
 	if p.mockErr != nil {
-		return params.ProviderVersion{}, p.mockErr
+		return params.ProviderVersionInfo{}, p.mockErr
 	}
-	return params.ProviderVersion{}, nil
+	return params.ProviderVersionInfo{}, nil
 }
 
 func TestResolveErrorToExitCode(t *testing.T) {

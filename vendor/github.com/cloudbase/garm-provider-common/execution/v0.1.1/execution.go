@@ -49,12 +49,17 @@ func ResolveErrorToExitCode(err error) int {
 }
 
 func GetEnvironment() (Environment, error) {
+	if os.Getenv("GARM_INTERFACE_VERSION") == "" {
+		os.Setenv("GARM_PROVIDER_VERSION", "v0.1.0")
+		fmt.Println("GARM_INTERFACE_VERSION is set to v0.1.0")
+	}
 	env := Environment{
-		Command:            ExecutionCommand(os.Getenv("GARM_COMMAND")),
-		ControllerID:       os.Getenv("GARM_CONTROLLER_ID"),
-		PoolID:             os.Getenv("GARM_POOL_ID"),
-		ProviderConfigFile: os.Getenv("GARM_PROVIDER_CONFIG_FILE"),
-		InstanceID:         os.Getenv("GARM_INSTANCE_ID"),
+		Command:              ExecutionCommand(os.Getenv("GARM_COMMAND")),
+		ControllerID:         os.Getenv("GARM_CONTROLLER_ID"),
+		PoolID:               os.Getenv("GARM_POOL_ID"),
+		ProviderConfigFile:   os.Getenv("GARM_PROVIDER_CONFIG_FILE"),
+		InstanceID:           os.Getenv("GARM_INSTANCE_ID"),
+		GarmInterfaceVersion: os.Getenv("GARM_INTERFACE_VERSION"),
 	}
 
 	// If this is a CreateInstance command, we need to get the bootstrap params
@@ -88,12 +93,13 @@ func GetEnvironment() (Environment, error) {
 }
 
 type Environment struct {
-	Command            ExecutionCommand
-	ControllerID       string
-	PoolID             string
-	ProviderConfigFile string
-	InstanceID         string
-	BootstrapParams    params.BootstrapInstance
+	Command              ExecutionCommand
+	ControllerID         string
+	PoolID               string
+	ProviderConfigFile   string
+	InstanceID           string
+	GarmInterfaceVersion string
+	BootstrapParams      params.BootstrapInstance
 }
 
 func (e Environment) Validate() error {
@@ -200,7 +206,13 @@ func Run(ctx context.Context, provider ExternalProvider, env Environment) (strin
 	case GetVersionInfoCommand:
 		versionInfo, err := provider.GetVersionInfo(ctx)
 		if err != nil {
-			return "", fmt.Errorf("failed to get version info: %w", err)
+			os.Setenv("GARM_PROVIDER_VERSION", "v0.1.0")
+			fmt.Println("GARM_INTERFACE_VERSION is set to default version v0.1.0")
+			break
+		}
+		if env.GarmInterfaceVersion != versionInfo.MaximumVersion {
+			os.Setenv("GARM_PROVIDER_VERSION", versionInfo.MaximumVersion)
+			fmt.Println("GARM_INTERFACE_VERSION is set to", versionInfo.MaximumVersion)
 		}
 		asJs, err := json.Marshal(versionInfo)
 		if err != nil {
