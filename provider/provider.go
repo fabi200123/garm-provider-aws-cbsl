@@ -27,8 +27,8 @@ import (
 	"github.com/cloudbase/garm-provider-aws/internal/spec"
 	"github.com/cloudbase/garm-provider-aws/internal/util"
 	garmErrors "github.com/cloudbase/garm-provider-common/errors"
-	"github.com/cloudbase/garm-provider-common/execution"
-	"github.com/cloudbase/garm-provider-common/params"
+	execution "github.com/cloudbase/garm-provider-common/execution/v0.1.1"
+	params "github.com/cloudbase/garm-provider-common/params/v0.1.1"
 )
 
 var _ execution.ExternalProvider = &AwsProvider{}
@@ -158,4 +158,11 @@ func (a *AwsProvider) Start(ctx context.Context, instance string) error {
 		return fmt.Errorf("instance %s cannot be started in %s state", instance, awsInstance.State.Name)
 	}
 	return a.awsCli.StartInstance(ctx, instance)
+}
+
+func (a *AwsProvider) GetVersionInfo(ctx context.Context) (params.ProviderVersionInfo, error) {
+	return params.ProviderVersionInfo{
+		MinimumVersion: "v0.1.0",
+		MaximumVersion: "v0.1.1",
+	}, nil
 }

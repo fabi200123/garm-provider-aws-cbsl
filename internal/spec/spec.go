@@ -21,9 +21,9 @@ import (
 	"fmt"
 
 	"github.com/cloudbase/garm-provider-aws/config"
-	"github.com/cloudbase/garm-provider-common/cloudconfig"
-	"github.com/cloudbase/garm-provider-common/params"
-	"github.com/cloudbase/garm-provider-common/util"
+	cloudconfig "github.com/cloudbase/garm-provider-common/cloudconfig/v0.1.1"
+	params "github.com/cloudbase/garm-provider-common/params/v0.1.1"
+	util "github.com/cloudbase/garm-provider-common/util/v0.1.1"
 	"github.com/xeipuuv/gojsonschema"
 )
 

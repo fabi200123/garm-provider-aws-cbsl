@@ -17,7 +17,7 @@ package execution
 import (
 	"context"
 
-	"github.com/cloudbase/garm-provider-common/params"
+	params "github.com/cloudbase/garm-provider-common/params/v0.1.0"
 )
 
 // ExternalProvider defines an interface that external providers need to implement.
@@ -38,4 +38,6 @@ type ExternalProvider interface {
 	Stop(ctx context.Context, instance string, force bool) error
 	// Start boots up an instance.
 	Start(ctx context.Context, instance string) error
+	// GetVersionInfo returns the version of the provider.
+	GetVersionInfo(ctx context.Context) (params.ProviderVersion, error)
 }
