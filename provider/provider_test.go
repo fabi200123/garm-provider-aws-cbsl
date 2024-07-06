@@ -27,7 +27,7 @@ import (
 	"github.com/cloudbase/garm-provider-aws/config"
 	"github.com/cloudbase/garm-provider-aws/internal/client"
 	"github.com/cloudbase/garm-provider-aws/internal/spec"
-	"github.com/cloudbase/garm-provider-common/params"
+	params "github.com/cloudbase/garm-provider-common/params/v0.1.1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

@@ -22,7 +22,7 @@ import (
 	"syscall"
 
 	"github.com/cloudbase/garm-provider-aws/provider"
-	"github.com/cloudbase/garm-provider-common/execution"
+	execution "github.com/cloudbase/garm-provider-common/execution/v0.1.1"
 )
 
 var signals = []os.Signal{

@@ -19,6 +19,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
@@ -27,8 +28,8 @@ import (
 	"github.com/cloudbase/garm-provider-aws/internal/spec"
 	"github.com/cloudbase/garm-provider-aws/internal/util"
 	garmErrors "github.com/cloudbase/garm-provider-common/errors"
-	"github.com/cloudbase/garm-provider-common/execution"
-	"github.com/cloudbase/garm-provider-common/params"
+	execution "github.com/cloudbase/garm-provider-common/execution/v0.1.1"
+	params "github.com/cloudbase/garm-provider-common/params/v0.1.1"
 )
 
 var _ execution.ExternalProvider = &AwsProvider{}
@@ -158,4 +159,16 @@ func (a *AwsProvider) Start(ctx context.Context, instance string) error {
 		return fmt.Errorf("instance %s cannot be started in %s state", instance, awsInstance.State.Name)
 	}
 	return a.awsCli.StartInstance(ctx, instance)
+}
+
+func (a *AwsProvider) GetVersionInfo(ctx context.Context) (params.VersionInfo, error) {
+	version := params.VersionInfo{
+		MinVersion: "v0.1.0",
+		MaxVersion: "v0.1.1",
+	}
+	//TODO: Add logic to compare and set GARM_INTERFACE_VERSION
+	if os.Getenv("GARM_INTERFACE_VERSION") != "" {
+		return version, nil
+	}
+	return params.VersionInfo{}, fmt.Errorf("failed to get version info: GARM_INTERFACE_VERSION not set")
 }
