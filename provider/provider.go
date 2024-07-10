@@ -27,7 +27,7 @@ import (
 	"github.com/cloudbase/garm-provider-aws/internal/spec"
 	"github.com/cloudbase/garm-provider-aws/internal/util"
 	garmErrors "github.com/cloudbase/garm-provider-common/errors"
-	"github.com/cloudbase/garm-provider-common/execution"
+	execution "github.com/cloudbase/garm-provider-common/execution/v0.1.1"
 	"github.com/cloudbase/garm-provider-common/params"
 )
 
