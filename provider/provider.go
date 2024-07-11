@@ -33,7 +33,7 @@ import (
 
 var _ execution.ExternalProvider = &AwsProvider{}
 
-func NewAwsProvider(ctx context.Context, configPath, controllerID string) (execution.ExternalProvider, error) {
+func NewAwsProvider(ctx context.Context, configPath, controllerID string, interfaceVersion string) (execution.ExternalProvider, error) {
 	conf, err := config.NewConfig(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("error loading config: %w", err)
@@ -44,14 +44,16 @@ func NewAwsProvider(ctx context.Context, configPath, controllerID string) (execu
 	}
 
 	return &AwsProvider{
-		controllerID: controllerID,
-		awsCli:       awsCli,
+		controllerID:     controllerID,
+		interfaceVersion: interfaceVersion,
+		awsCli:           awsCli,
 	}, nil
 }
 
 type AwsProvider struct {
-	controllerID string
-	awsCli       *client.AwsCli
+	controllerID     string
+	interfaceVersion string
+	awsCli           *client.AwsCli
 }
 
 func (a *AwsProvider) CreateInstance(ctx context.Context, bootstrapParams params.BootstrapInstance) (params.ProviderInstance, error) {
