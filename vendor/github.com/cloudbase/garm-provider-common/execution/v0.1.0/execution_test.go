@@ -24,7 +24,7 @@ import (
 	"testing"
 
 	gErrors "github.com/cloudbase/garm-provider-common/errors"
-	params "github.com/cloudbase/garm-provider-common/params"
+	"github.com/cloudbase/garm-provider-common/params"
 	"github.com/stretchr/testify/require"
 )
 

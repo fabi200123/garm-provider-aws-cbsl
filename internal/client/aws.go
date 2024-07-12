@@ -232,7 +232,7 @@ func (a *AwsCli) ListDescribedInstances(ctx context.Context, poolID string) ([]t
 	return instances, nil
 }
 
-func (a *AwsCli) CreateRunningInstance(ctx context.Context, spec *spec.RunnerSpec) (string, error) {
+func (a *AwsCli) CreateRunningInstance(ctx context.Context, spec *spec.RunnerSpec, poolImage string, interfaceVersion string) (string, error) {
 
 	if spec == nil {
 		return "", fmt.Errorf("invalid nil runner spec")
@@ -274,6 +274,14 @@ func (a *AwsCli) CreateRunningInstance(ctx context.Context, spec *spec.RunnerSpe
 					{
 						Key:   aws.String("GARM_CONTROLLER_ID"),
 						Value: aws.String(spec.ControllerID),
+					},
+					{
+						Key:   aws.String("GARM_INTERFACE_VERSION"),
+						Value: aws.String(interfaceVersion),
+					},
+					{
+						Key:   aws.String("GARM_POOL_IMAGE"),
+						Value: aws.String(poolImage),
 					},
 				},
 			},

@@ -33,7 +33,7 @@ import (
 
 var _ execution.ExternalProvider = &AwsProvider{}
 
-func NewAwsProvider(ctx context.Context, configPath, controllerID string, interfaceVersion string) (execution.ExternalProvider, error) {
+func NewAwsProvider(ctx context.Context, configPath, controllerID string, interfaceVersion string, poolImage string, poolID string) (execution.ExternalProvider, error) {
 	conf, err := config.NewConfig(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("error loading config: %w", err)
@@ -46,6 +46,8 @@ func NewAwsProvider(ctx context.Context, configPath, controllerID string, interf
 	return &AwsProvider{
 		controllerID:     controllerID,
 		interfaceVersion: interfaceVersion,
+		poolID:           poolID,
+		poolImage:        poolImage,
 		awsCli:           awsCli,
 	}, nil
 }
@@ -53,6 +55,8 @@ func NewAwsProvider(ctx context.Context, configPath, controllerID string, interf
 type AwsProvider struct {
 	controllerID     string
 	interfaceVersion string
+	poolID           string
+	poolImage        string
 	awsCli           *client.AwsCli
 }
 
@@ -62,14 +66,14 @@ func (a *AwsProvider) CreateInstance(ctx context.Context, bootstrapParams params
 		return params.ProviderInstance{}, fmt.Errorf("failed to get runner spec: %w", err)
 	}
 
-	instanceID, err := a.awsCli.CreateRunningInstance(ctx, spec)
+	instanceID, err := a.awsCli.CreateRunningInstance(ctx, spec, a.poolImage, a.interfaceVersion)
 	if err != nil {
 		return params.ProviderInstance{}, fmt.Errorf("failed to create instance: %w", err)
 	}
 
 	instance := params.ProviderInstance{
 		ProviderID: instanceID,
-		Name:       spec.BootstrapParams.Name,
+		Name:       a.poolID,
 		OSType:     spec.BootstrapParams.OSType,
 		OSArch:     spec.BootstrapParams.OSArch,
 		Status:     "running",
@@ -122,11 +126,12 @@ func (a *AwsProvider) GetInstance(ctx context.Context, instance string) (params.
 	if err != nil {
 		return params.ProviderInstance{}, fmt.Errorf("failed to convert instance: %w", err)
 	}
+	providerInstance.Name = a.poolID
 	return providerInstance, nil
 }
 
 func (a *AwsProvider) ListInstances(ctx context.Context, poolID string) ([]params.ProviderInstance, error) {
-	awsInstances, err := a.awsCli.ListDescribedInstances(ctx, poolID)
+	awsInstances, err := a.awsCli.ListDescribedInstances(ctx, a.poolID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list instances: %w", err)
 	}

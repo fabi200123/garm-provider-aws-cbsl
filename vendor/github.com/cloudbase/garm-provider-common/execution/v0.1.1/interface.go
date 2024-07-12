@@ -17,7 +17,7 @@ package execution
 import (
 	"context"
 
-	params "github.com/cloudbase/garm-provider-common/params"
+	"github.com/cloudbase/garm-provider-common/params"
 )
 
 // ExternalProvider defines an interface that external providers need to implement.
