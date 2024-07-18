@@ -386,7 +386,7 @@ func TestCreateRunningInstance(t *testing.T) {
 		},
 	}, nil)
 
-	instance, err := awsCli.CreateRunningInstance(ctx, spec, "", "")
+	instance, err := awsCli.CreateRunningInstance(ctx, spec, "", "", *spec)
 	require.NoError(t, err)
 	require.Equal(t, instanceID, instance)
 }

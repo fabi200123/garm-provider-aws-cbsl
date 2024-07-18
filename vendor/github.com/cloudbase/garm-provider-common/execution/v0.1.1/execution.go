@@ -57,6 +57,8 @@ func GetEnvironment() (Environment, error) {
 		ProviderConfigFile: os.Getenv("GARM_PROVIDER_CONFIG_FILE"),
 		InstanceID:         os.Getenv("GARM_INSTANCE_ID"),
 		InterfaceVersion:   os.Getenv("GARM_INTERFACE_VERSION"),
+		ParamsControllerID: os.Getenv("GARM_PARAMS_CONTROLLER_ID"),
+		ExtraSpecs:         os.Getenv("GARM_POOL_EXTRASPECS"),
 	}
 
 	// If this is a CreateInstance command, we need to get the bootstrap params
@@ -101,6 +103,8 @@ type Environment struct {
 	ProviderConfigFile string
 	InstanceID         string
 	InterfaceVersion   string
+	ParamsControllerID string
+	ExtraSpecs         string
 	BootstrapParams    params.BootstrapInstance
 }
 

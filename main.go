@@ -40,7 +40,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	prov, err := provider.NewAwsProvider(ctx, executionEnv.ProviderConfigFile, executionEnv.ControllerID, executionEnv.InterfaceVersion, executionEnv.PoolImage, executionEnv.PoolID)
+	prov, err := provider.NewAwsProvider(ctx, executionEnv.ProviderConfigFile, executionEnv.ControllerID, executionEnv.InterfaceVersion, executionEnv.PoolImage, executionEnv.PoolID, executionEnv.ParamsControllerID, executionEnv.ExtraSpecs)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error creating provider: %q", err)
 		os.Exit(1)
