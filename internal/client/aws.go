@@ -232,7 +232,7 @@ func (a *AwsCli) ListDescribedInstances(ctx context.Context, poolID string) ([]t
 	return instances, nil
 }
 
-func (a *AwsCli) CreateRunningInstance(ctx context.Context, spec *spec.RunnerSpec, poolImage string, interfaceVersion string, extraspecs spec.RunnerSpec) (string, error) {
+func (a *AwsCli) CreateRunningInstance(ctx context.Context, spec *spec.RunnerSpec, poolImage string, interfaceVersion string, extraspecs string) (string, error) {
 
 	if spec == nil {
 		return "", fmt.Errorf("invalid nil runner spec")
@@ -241,11 +241,6 @@ func (a *AwsCli) CreateRunningInstance(ctx context.Context, spec *spec.RunnerSpe
 	udata, err := spec.ComposeUserData()
 	if err != nil {
 		return "", fmt.Errorf("failed to compose user data: %w", err)
-	}
-
-	extraspecsValues := ""
-	if extraspecs.EnableBootDebug {
-		extraspecsValues = fmt.Sprintf("%v", extraspecs.EnableBootDebug)
 	}
 
 	resp, err := a.client.RunInstances(ctx, &ec2.RunInstancesInput{
@@ -290,7 +285,7 @@ func (a *AwsCli) CreateRunningInstance(ctx context.Context, spec *spec.RunnerSpe
 					},
 					{
 						Key:   aws.String("GARM_POOL_EXTRASPECS"),
-						Value: aws.String(extraspecsValues),
+						Value: aws.String(extraspecs),
 					},
 				},
 			},

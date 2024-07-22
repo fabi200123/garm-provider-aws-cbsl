@@ -17,7 +17,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -34,7 +33,7 @@ import (
 
 var _ execution.ExternalProvider = &AwsProvider{}
 
-func NewAwsProvider(ctx context.Context, configPath, controllerID string, interfaceVersion string, poolImage string, poolID string, paramsControllerID string, poolExtraSpecs string) (execution.ExternalProvider, error) {
+func NewAwsProvider(ctx context.Context, configPath, controllerID string, interfaceVersion string, poolID string, poolExtraSpecs string) (execution.ExternalProvider, error) {
 	conf, err := config.NewConfig(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("error loading config: %w", err)
@@ -45,36 +44,30 @@ func NewAwsProvider(ctx context.Context, configPath, controllerID string, interf
 	}
 
 	return &AwsProvider{
-		controllerID:       controllerID,
-		interfaceVersion:   interfaceVersion,
-		poolID:             poolID,
-		poolImage:          poolImage,
-		paramsControllerID: paramsControllerID,
-		poolExtraSpecs:     json.RawMessage(poolExtraSpecs),
-		awsCli:             awsCli,
+		controllerID:     controllerID,
+		interfaceVersion: interfaceVersion,
+		poolID:           poolID,
+		poolExtraSpecs:   poolExtraSpecs,
+		awsCli:           awsCli,
 	}, nil
 }
 
 type AwsProvider struct {
-	controllerID       string
-	interfaceVersion   string
-	poolID             string
-	poolImage          string
-	poolExtraSpecs     json.RawMessage
-	paramsControllerID string
-	awsCli             *client.AwsCli
+	controllerID     string
+	interfaceVersion string
+	poolID           string
+	poolImage        string
+	poolExtraSpecs   string
+	awsCli           *client.AwsCli
 }
 
 func (a *AwsProvider) CreateInstance(ctx context.Context, bootstrapParams params.BootstrapInstance) (params.ProviderInstance, error) {
-	extraspec, err := spec.GetRunnerSpecFromBootstrapParams(a.awsCli.Config(), params.BootstrapInstance{
-		ExtraSpecs: a.poolExtraSpecs,
-	}, a.controllerID)
 	spec, err := spec.GetRunnerSpecFromBootstrapParams(a.awsCli.Config(), bootstrapParams, a.controllerID)
 	if err != nil {
 		return params.ProviderInstance{}, fmt.Errorf("failed to get runner spec: %w", err)
 	}
 
-	instanceID, err := a.awsCli.CreateRunningInstance(ctx, spec, a.poolImage, a.interfaceVersion, *extraspec)
+	instanceID, err := a.awsCli.CreateRunningInstance(ctx, spec, a.poolImage, a.interfaceVersion, a.poolExtraSpecs)
 	if err != nil {
 		return params.ProviderInstance{}, fmt.Errorf("failed to create instance: %w", err)
 	}
@@ -123,8 +116,8 @@ func (a *AwsProvider) DeleteInstance(ctx context.Context, instance string) error
 
 func (a *AwsProvider) GetInstance(ctx context.Context, instance string) (params.ProviderInstance, error) {
 	awsInstance, err := a.awsCli.FindOneInstance(ctx, "", instance)
-	if err == nil {
-		return params.ProviderInstance{}, fmt.Errorf("GOOD ERROR! PARAMS CONTROLLER ID IS %s", a.paramsControllerID)
+	if err != nil {
+		return params.ProviderInstance{}, fmt.Errorf("failed to determine instance: %w", err)
 	}
 	if awsInstance.InstanceId == nil {
 		return params.ProviderInstance{}, nil

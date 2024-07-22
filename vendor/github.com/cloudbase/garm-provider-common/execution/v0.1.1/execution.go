@@ -53,11 +53,9 @@ func GetEnvironment() (Environment, error) {
 		Command:            ExecutionCommand(os.Getenv("GARM_COMMAND")),
 		ControllerID:       os.Getenv("GARM_CONTROLLER_ID"),
 		PoolID:             os.Getenv("GARM_POOL_ID"),
-		PoolImage:          os.Getenv("GARM_POOL_IMAGE"),
 		ProviderConfigFile: os.Getenv("GARM_PROVIDER_CONFIG_FILE"),
 		InstanceID:         os.Getenv("GARM_INSTANCE_ID"),
 		InterfaceVersion:   os.Getenv("GARM_INTERFACE_VERSION"),
-		ParamsControllerID: os.Getenv("GARM_PARAMS_CONTROLLER_ID"),
 		ExtraSpecs:         os.Getenv("GARM_POOL_EXTRASPECS"),
 	}
 
@@ -99,11 +97,9 @@ type Environment struct {
 	Command            ExecutionCommand
 	ControllerID       string
 	PoolID             string
-	PoolImage          string
 	ProviderConfigFile string
 	InstanceID         string
 	InterfaceVersion   string
-	ParamsControllerID string
 	ExtraSpecs         string
 	BootstrapParams    params.BootstrapInstance
 }
