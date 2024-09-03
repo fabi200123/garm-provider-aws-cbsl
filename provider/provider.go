@@ -167,3 +167,19 @@ func (a *AwsProvider) Start(ctx context.Context, instance string) error {
 	}
 	return a.awsCli.StartInstance(ctx, instance)
 }
+
+func (a *AwsProvider) GetVersion(ctx context.Context) string {
+	return a.interfaceVersion
+}
+
+func (a *AwsProvider) ValidatePoolInfo(ctx context.Context, image string, flavor string, configFile string, extraspecs string) error {
+	return nil
+}
+
+func (a *AwsProvider) GetConfigJSONSchema(ctx context.Context) (string, error) {
+	return "GetConfigJSONSchema works, needs implementings", nil
+}
+
+func (a *AwsProvider) GetExtraSpecsJSONSchema(ctx context.Context) (string, error) {
+	return "GetExtraSpecsJSONSchema works, needs implementing", nil
+}

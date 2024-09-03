@@ -12,31 +12,11 @@
 //    License for the specific language governing permissions and limitations
 //    under the License.
 
-package exec
+package common
 
-import (
-	"context"
-	"testing"
-
-	"github.com/stretchr/testify/require"
+const (
+	// Version v0.1.0
+	Version010 = "v0.1.0"
+	// Version v0.1.1
+	Version011 = "v0.1.1"
 )
-
-func TestExecSuccess(t *testing.T) {
-	ctx := context.Background()
-	providerBin := "gofmt"
-	stdinData := []byte("")
-	environ := []string{"TEST=1"}
-
-	_, err := Exec(ctx, providerBin, stdinData, environ)
-	require.NoError(t, err)
-}
-
-func TestExecFail(t *testing.T) {
-	ctx := context.Background()
-	providerBin := "garm-provider-test"
-	stdinData := []byte("test")
-	environ := []string{"TEST=1"}
-
-	_, err := Exec(ctx, providerBin, stdinData, environ)
-	require.ErrorContains(t, err, "provider binary failed with stdout")
-}
