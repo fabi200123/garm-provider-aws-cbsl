@@ -115,6 +115,11 @@ func (e EnvironmentV011) Validate() error {
 		if !semver.IsValid(e.InterfaceVersion) {
 			return fmt.Errorf("invalid interface version: %s", e.InterfaceVersion)
 		}
+	case common.ValidatePoolInfoCommand, common.GetConfigJSONSchemaCommand,
+		common.GetExtraSpecsJSONSchemaCommand:
+		if !semver.IsValid(e.InterfaceVersion) && e.InterfaceVersion == common.Version010 {
+			return fmt.Errorf("invalid interface version: %s", e.InterfaceVersion)
+		}
 	default:
 		return fmt.Errorf("unknown GARM_COMMAND: %s", e.Command)
 	}
