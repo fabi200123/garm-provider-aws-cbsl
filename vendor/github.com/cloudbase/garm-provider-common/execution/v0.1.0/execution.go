@@ -62,6 +62,11 @@ func (e EnvironmentV010) Validate() error {
 		return fmt.Errorf("missing GARM_COMMAND")
 	}
 
+	// GetVersionCommand does not require any other env vars
+	if e.Command == common.GetVersionCommand {
+		return nil
+	}
+
 	if e.ProviderConfigFile == "" {
 		return fmt.Errorf("missing GARM_PROVIDER_CONFIG_FILE")
 	}
