@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/cloudbase/garm-provider-aws/config"
 	"github.com/cloudbase/garm-provider-common/cloudconfig"
 	"github.com/cloudbase/garm-provider-common/params"
@@ -73,12 +74,13 @@ func newExtraSpecsFromBootstrapData(data params.BootstrapInstance) (*extraSpecs,
 }
 
 type extraSpecs struct {
-	SubnetID         *string  `json:"subnet_id,omitempty" jsonschema:"pattern=^subnet-[0-9a-fA-F]{17}$"`
-	SSHKeyName       *string  `json:"ssh_key_name,omitempty" jsonschema:"description=The name of the Key Pair to use for the instance."`
-	SecurityGroupIds []string `json:"security_group_ids,omitempty" jsonschema:"description=The security groups IDs to associate with the instance. Default: Amazon EC2 uses the default security group."`
-	DisableUpdates   *bool    `json:"disable_updates,omitempty" jsonschema:"description=Disable automatic updates on the VM."`
-	EnableBootDebug  *bool    `json:"enable_boot_debug,omitempty" jsonschema:"description=Enable boot debug on the VM"`
-	ExtraPackages    []string `json:"extra_packages,omitempty" jsonschema:"description=Extra packages to install on the VM"`
+	SubnetID         *string               `json:"subnet_id,omitempty" jsonschema:"pattern=^subnet-[0-9a-fA-F]{17}$"`
+	SSHKeyName       *string               `json:"ssh_key_name,omitempty" jsonschema:"description=The name of the Key Pair to use for the instance."`
+	SecurityGroupIds []string              `json:"security_group_ids,omitempty" jsonschema:"description=The security groups IDs to associate with the instance. Default: Amazon EC2 uses the default security group."`
+	EbsBlockDevice   *types.EbsBlockDevice `json:"ebs_block_device,omitempty" jsonschema:"description=The EBS block device to attach to the instance."`
+	DisableUpdates   *bool                 `json:"disable_updates,omitempty" jsonschema:"description=Disable automatic updates on the VM."`
+	EnableBootDebug  *bool                 `json:"enable_boot_debug,omitempty" jsonschema:"description=Enable boot debug on the VM"`
+	ExtraPackages    []string              `json:"extra_packages,omitempty" jsonschema:"description=Extra packages to install on the VM"`
 	// The Cloudconfig struct from common package
 	cloudconfig.CloudConfigSpec
 }
@@ -121,6 +123,7 @@ type RunnerSpec struct {
 	BootstrapParams  params.BootstrapInstance
 	SecurityGroupIds []string
 	SubnetID         string
+	EbsBlockDevice   *types.EbsBlockDevice
 	SSHKeyName       *string
 	ControllerID     string
 }
@@ -146,6 +149,10 @@ func (r *RunnerSpec) MergeExtraSpecs(extraSpecs *extraSpecs) {
 
 	if len(extraSpecs.SecurityGroupIds) > 0 {
 		r.SecurityGroupIds = extraSpecs.SecurityGroupIds
+	}
+
+	if extraSpecs.EbsBlockDevice != nil {
+		r.EbsBlockDevice = extraSpecs.EbsBlockDevice
 	}
 
 	if extraSpecs.DisableUpdates != nil {

@@ -244,10 +244,15 @@ func (a *AwsCli) CreateRunningInstance(ctx context.Context, spec *spec.RunnerSpe
 	}
 
 	resp, err := a.client.RunInstances(ctx, &ec2.RunInstancesInput{
-		ImageId:          aws.String(spec.BootstrapParams.Image),
-		InstanceType:     types.InstanceType(spec.BootstrapParams.Flavor),
-		MaxCount:         aws.Int32(1),
-		MinCount:         aws.Int32(1),
+		ImageId:      aws.String(spec.BootstrapParams.Image),
+		InstanceType: types.InstanceType(spec.BootstrapParams.Flavor),
+		MaxCount:     aws.Int32(1),
+		MinCount:     aws.Int32(1),
+		BlockDeviceMappings: []types.BlockDeviceMapping{
+			{
+				Ebs: spec.EbsBlockDevice,
+			},
+		},
 		SubnetId:         aws.String(spec.SubnetID),
 		SecurityGroupIds: spec.SecurityGroupIds,
 		UserData:         aws.String(udata),
