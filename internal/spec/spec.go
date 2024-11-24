@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/cloudbase/garm-provider-aws/config"
 	"github.com/cloudbase/garm-provider-common/cloudconfig"
 	"github.com/cloudbase/garm-provider-common/params"
@@ -73,12 +74,16 @@ func newExtraSpecsFromBootstrapData(data params.BootstrapInstance) (*extraSpecs,
 }
 
 type extraSpecs struct {
-	SubnetID         *string  `json:"subnet_id,omitempty" jsonschema:"pattern=^subnet-[0-9a-fA-F]{17}$"`
-	SSHKeyName       *string  `json:"ssh_key_name,omitempty" jsonschema:"description=The name of the Key Pair to use for the instance."`
-	SecurityGroupIds []string `json:"security_group_ids,omitempty" jsonschema:"description=The security groups IDs to associate with the instance. Default: Amazon EC2 uses the default security group."`
-	DisableUpdates   *bool    `json:"disable_updates,omitempty" jsonschema:"description=Disable automatic updates on the VM."`
-	EnableBootDebug  *bool    `json:"enable_boot_debug,omitempty" jsonschema:"description=Enable boot debug on the VM"`
-	ExtraPackages    []string `json:"extra_packages,omitempty" jsonschema:"description=Extra packages to install on the VM"`
+	SubnetID         *string          `json:"subnet_id,omitempty" jsonschema:"pattern=^subnet-[0-9a-fA-F]{17}$"`
+	SSHKeyName       *string          `json:"ssh_key_name,omitempty" jsonschema:"description=The name of the Key Pair to use for the instance."`
+	Iops             *int32           `json:"iops,omitempty" jsonschema:"description=The number of IOPS (Input/Output Operations Per Second) to provision for the volume. Only valid for volume_type=io1"`
+	Throughput       *int32           `json:"throughput,omitempty" jsonschema:"description=The throughput (MiB/s) to provision for the volume. Only valid for volume_type=gp3"`
+	VolumeSize       *int32           `json:"volume_size,omitempty" jsonschema:"description=The size of the volume, in GiB. Default: 8"`
+	VolumeType       types.VolumeType `json:"volume_type,omitempty" jsonschema:"description=The volume type. Default: gp2"`
+	SecurityGroupIds []string         `json:"security_group_ids,omitempty" jsonschema:"description=The security groups IDs to associate with the instance. Default: Amazon EC2 uses the default security group."`
+	DisableUpdates   *bool            `json:"disable_updates,omitempty" jsonschema:"description=Disable automatic updates on the VM."`
+	EnableBootDebug  *bool            `json:"enable_boot_debug,omitempty" jsonschema:"description=Enable boot debug on the VM"`
+	ExtraPackages    []string         `json:"extra_packages,omitempty" jsonschema:"description=Extra packages to install on the VM"`
 	// The Cloudconfig struct from common package
 	cloudconfig.CloudConfigSpec
 }
@@ -122,6 +127,10 @@ type RunnerSpec struct {
 	SecurityGroupIds []string
 	SubnetID         string
 	SSHKeyName       *string
+	Iops             *int32
+	Throughput       *int32
+	VolumeSize       *int32
+	VolumeType       types.VolumeType
 	ControllerID     string
 }
 
@@ -138,6 +147,25 @@ func (r *RunnerSpec) Validate() error {
 func (r *RunnerSpec) MergeExtraSpecs(extraSpecs *extraSpecs) {
 	if extraSpecs.SubnetID != nil && *extraSpecs.SubnetID != "" {
 		r.SubnetID = *extraSpecs.SubnetID
+	}
+
+	if extraSpecs.Iops != nil &&
+		(extraSpecs.VolumeType == types.VolumeTypeGp3 ||
+			extraSpecs.VolumeType == types.VolumeTypeIo1 ||
+			extraSpecs.VolumeType == types.VolumeTypeIo2) {
+		r.Iops = extraSpecs.Iops
+	}
+
+	if extraSpecs.Throughput != nil && extraSpecs.VolumeType == types.VolumeTypeGp3 {
+		r.Throughput = extraSpecs.Throughput
+	}
+
+	if extraSpecs.VolumeSize != nil {
+		r.VolumeSize = extraSpecs.VolumeSize
+	}
+
+	if extraSpecs.VolumeType != "" {
+		r.VolumeType = extraSpecs.VolumeType
 	}
 
 	if extraSpecs.SSHKeyName != nil {

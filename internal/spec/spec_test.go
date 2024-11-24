@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/cloudbase/garm-provider-aws/config"
 	"github.com/cloudbase/garm-provider-common/cloudconfig"
 	"github.com/cloudbase/garm-provider-common/params"
@@ -36,10 +37,14 @@ func TestExtraSpecsFromBootstrapData(t *testing.T) {
 		{
 			name: "valid bootstrap data",
 			input: params.BootstrapInstance{
-				ExtraSpecs: json.RawMessage(`{"subnet_id": "subnet-0a0a0a0a0a0a0a0a0", "ssh_key_name": "ssh_key_name", "security_group_ids": ["sg-018c35963edfb1cce", "sg-018c35963edfb1cee"], "disable_updates": true, "enable_boot_debug": true, "extra_packages": ["package1", "package2"], "runner_install_template": "IyEvYmluL2Jhc2gKZWNobyBJbnN0YWxsaW5nIHJ1bm5lci4uLg==", "pre_install_scripts": {"setup.sh": "IyEvYmluL2Jhc2gKZWNobyBTZXR1cCBzY3JpcHQuLi4="}, "extra_context": {"key": "value"}}`),
+				ExtraSpecs: json.RawMessage(`{"subnet_id": "subnet-0a0a0a0a0a0a0a0a0", "ssh_key_name": "ssh_key_name", "security_group_ids": ["sg-018c35963edfb1cce", "sg-018c35963edfb1cee"], "iops": 3000, "throughput": 200, "volume_size": 50, "volume_type": "gp3", "disable_updates": true, "enable_boot_debug": true, "extra_packages": ["package1", "package2"], "runner_install_template": "IyEvYmluL2Jhc2gKZWNobyBJbnN0YWxsaW5nIHJ1bm5lci4uLg==", "pre_install_scripts": {"setup.sh": "IyEvYmluL2Jhc2gKZWNobyBTZXR1cCBzY3JpcHQuLi4="}, "extra_context": {"key": "value"}}`),
 			},
 			expectedOutput: &extraSpecs{
 				SubnetID:         aws.String("subnet-0a0a0a0a0a0a0a0a0"),
+				Iops:             aws.Int32(3000),
+				Throughput:       aws.Int32(200),
+				VolumeSize:       aws.Int32(50),
+				VolumeType:       types.VolumeTypeGp3,
 				SSHKeyName:       aws.String("ssh_key_name"),
 				SecurityGroupIds: []string{"sg-018c35963edfb1cce", "sg-018c35963edfb1cee"},
 				DisableUpdates:   aws.Bool(true),
