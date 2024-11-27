@@ -187,6 +187,15 @@ func (r *RunnerSpec) Validate() error {
 			return fmt.Errorf("EBS volume size is only valid for volume types io1, io2, gp2, gp3, st1, sc1 and standard")
 		}
 	}
+
+	if r.VolumeType != "" {
+		switch r.VolumeType {
+		case types.VolumeTypeIo1, types.VolumeTypeIo2:
+			if r.Iops == nil {
+				return fmt.Errorf("the parameter iops must be specified for %s volumes", r.VolumeType)
+			}
+		}
+	}
 	return nil
 }
 
